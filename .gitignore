@@ -1,0 +1,37 @@
+# Environment Variables and Secrets
+.env
+*.env
+
+# Large Data Files (PDFs and Datasets)
+Data/
+data/
+*.pdf
+
+# Python Clutter
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Performance and Cache
+.ipynb_checkpoints/
+.pytest_cache/
+
+# IDE/System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
