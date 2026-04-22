@@ -70,16 +70,16 @@ def build_vector_store(dataset_name, embedder, retriever):
     retriever.save(index_dir)
     return True
 
-def run_query(query, dataset_name, retriever, llm_client):
+def run_query(query, dataset_name, retriever, llm_client, top_k=3):
     data_dir, index_dir = get_dir_paths(dataset_name)
     
     print(f"Loading index for '{dataset_name}'...")
     if not retriever.load(index_dir):
         print("[ERROR] Index could not be loaded. Please run --mode index first.")
-        return
+        return None
         
     print(f"\n{'='*50}\n[QUERY]: {query}\n{'='*50}")
-    chunks = retriever.retrieve(query, top_k=3)
+    chunks = retriever.retrieve(query, top_k=top_k)
     
     if DEBUG:
         print(f"\n[DEBUG] Pushing {len(chunks)} chunks to GEMINI...")
@@ -87,6 +87,22 @@ def run_query(query, dataset_name, retriever, llm_client):
     answer = llm_client.generate_answer(query, chunks)
     print(f"\n[FINAL GROUNDED ANSWER]:\n{answer}")
     print("=" * 50)
+    
+    # Return structured result for UI consumption
+    sources = []
+    for chunk in chunks:
+        sources.append({
+            "text": chunk["text"],
+            "source": chunk["metadata"]["source"],
+            "page": chunk["metadata"]["page"],
+            "year": chunk["metadata"].get("year", "Unknown"),
+            "score": chunk["score"]
+        })
+    
+    return {
+        "answer": answer,
+        "sources": sources
+    }
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Portable Baseline RAG System")
