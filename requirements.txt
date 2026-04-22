@@ -8,3 +8,4 @@ rank_bm25==0.2.2
 streamlit==1.32.2
 langchain-google-genai
 python-dotenv
+faiss-cpu==1.8.0

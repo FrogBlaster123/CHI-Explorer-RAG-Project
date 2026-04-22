@@ -26,7 +26,8 @@ class SimpleGeminiClient:
         for i, chunk in enumerate(retrieved_chunks):
             source = chunk["metadata"]["source"]
             page = chunk["metadata"]["page"]
-            context_str += f"\n--- CHUNK {i+1} [{source}, Page {page}] ---\n"
+            year = chunk["metadata"].get("year", "Unknown")
+            context_str += f"\n--- CHUNK {i+1} [{source}, Year: {year}, Page {page}] ---\n"
             context_str += chunk["text"] + "\n"
             
         prompt = f"""You are an expert Research Assistant. 
@@ -34,7 +35,7 @@ Answer the following user query USING ONLY the provided context chunks.
 
 RULES:
 1. NO HALLUCINATION. If the context does not contain sufficient evidence to answer the query, exactly state: "There is insufficient evidence in the retrieved literature to answer this."
-2. ALWAYS CITE SOURCES. Use the format provided in the chunk headers (e.g., [2022_large.pdf, Page 42]).
+2. ALWAYS CITE SOURCES. You must include the EXACT source filename in your responses (e.g., [2022_large.pdf, Year: 2022, Page 42]).
 3. Be clear and structured. Use bullet points when helpful.
 
 CONTEXT:

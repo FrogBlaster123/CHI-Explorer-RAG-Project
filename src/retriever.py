@@ -1,62 +1,39 @@
-import numpy as np
-from config import DEBUG
+from vector_store import FaissVectorStore
 
 class BaselineRetriever:
     def __init__(self, embedder):
         self.embedder = embedder
-        # Vector storage is an in-memory list: [(chunk_text, embedding_vector, metadata_dict)]
-        self.vector_store = []
+        self.vector_store = FaissVectorStore()
         
     def add_chunks(self, chunks_with_embeddings):
-        """
-        Adds pre-computed embeddings to the in-memory list.
-        Expects a list of dicts: {"text": str, "embedding": List[float], "metadata": dict}
-        """
-        for item in chunks_with_embeddings:
-            self.vector_store.append((
-                item["text"],
-                np.array(item["embedding"]),
-                item["metadata"]
-            ))
+        """Adds chunks to the FAISS store."""
+        self.vector_store.add_chunks(chunks_with_embeddings)
             
-    def cosine_similarity(self, vec_a, vec_b):
-        """Standard cosine similarity between two numpy vectors."""
-        dot = np.dot(vec_a, vec_b)
-        norm_a = np.linalg.norm(vec_a)
-        norm_b = np.linalg.norm(vec_b)
-        if norm_a == 0 or norm_b == 0:
-            return 0.0
-        return dot / (norm_a * norm_b)
+    def save(self, save_dir: str):
+        """Saves current index."""
+        self.vector_store.save(save_dir)
+        
+    def load(self, save_dir: str) -> bool:
+        """Loads index into FAISS store."""
+        return self.vector_store.load(save_dir)
         
     def retrieve(self, query: str, top_k: int = 3):
-        """
-        Retrieves the top-k chunks that most strongly match the query.
-        """
-        if not self.vector_store:
+        """Retrieves using the FAISS vector store backing."""
+        if self.vector_store.index.ntotal == 0:
             print("[WARNING] Vector store is empty. No chunks to retrieve.")
             return []
             
-        query_emb = np.array(self.embedder.get_embedding(query))
-        
-        # Calculate scores computationally against memory pool
-        scored_chunks = []
-        for text, emb, meta in self.vector_store:
-            score = self.cosine_similarity(query_emb, emb)
-            scored_chunks.append({
-                "score": float(score),
-                "text": text,
-                "metadata": meta
-            })
-            
-        # Sort descending by score
-        scored_chunks.sort(key=lambda x: x["score"], reverse=True)
-        top_results = scored_chunks[:top_k]
+        query_emb = self.embedder.get_embedding(query)
+        top_results = self.vector_store.retrieve_top_k(query_emb, top_k)
         
         # Obey DEBUG flag logging rules
+        from config import DEBUG
         if DEBUG:
             print(f"\n[DEBUG] === Retrieval Results for: '{query}' ===")
             for i, res in enumerate(top_results):
-                print(f"Rank {i+1} | Score: {res['score']:.4f} | Source: {res['metadata']['source']} (Page {res['metadata']['page']})")
+                meta = res['metadata']
+                yr = meta.get('year', 'Unknown')
+                print(f"Rank {i+1} | L2 Dist: {res['score']:.4f} | Source: {meta['source']} ({yr}, Page {meta['page']})")
                 print(f"  Snippet: {res['text'][:150]}...\n")
                 
         return top_results
