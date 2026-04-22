@@ -1,6 +1,6 @@
 # CHI-Explorer: Memory-Safe RAG Architecture
 
-A decoupled, "Level 2" Retrieval-Augmented Generation (RAG) system built to parse, embed, and query massive 2GB+ documentation pipelines (like entire years of ACM CHI research proceedings) natively on standard hardware without Out-of-Memory (OOM) crashes.
+A decoupled, Retrieval-Augmented Generation (RAG) system built to parse, embed, and query massive 2GB+ documentation pipelines (like entire years of ACM CHI research proceedings) natively on standard hardware without Out-of-Memory (OOM) crashes.
 
 ## 🌟 Why This Project Exists
 
