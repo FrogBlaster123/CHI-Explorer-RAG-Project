@@ -50,7 +50,17 @@ Now that the heavy lifting is done, you can instantly query your specific datase
 python src/main.py --mode query --dataset chi_papers --query "Explain Growing Blip's Content"
 ```
 
+### Phase 3: Visual Interface (Streamlit)
+For a better experience, you can interact with the RAG system using the rich, graphical web interface rather than the CLI. The UI allows you to select your indexed datasets, adjust the top K retrieved results, and view formatted sources cleanly in expandable cards.
+
+Simply run:
+```bash
+streamlit run app.py
+```
+This will automatically launch the web server and open the interface in your browser at `http://localhost:8501`.
+
 ## 📁 Repository Structure
+* `app.py` - The complete graphical web application (Streamlit).
 * `data/{dataset_name}/` - Drop your raw PDFs here.
 * `data/indexes/{dataset_name}/` - The system generates your FAISS `.bin` and Metadata maps here.
 * `src/main.py` - Core execution CLI orchestrator.
