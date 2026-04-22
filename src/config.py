@@ -10,6 +10,5 @@ CHUNK_SIZE_CHARS = 2500
 CHUNK_OVERLAP_CHARS = 300
 
 # Limits how many pages we read from a single PDF.
-# For a 2GB PDF, reading all pages might take a while, so we limit for testing.
-# Set to None to read the entire document.
-MAX_PAGES_PER_DOC = 50 
+# Set to None to process all 18000+ pages properly.
+MAX_PAGES_PER_DOC = None

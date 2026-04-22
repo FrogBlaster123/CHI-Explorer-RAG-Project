@@ -23,16 +23,26 @@ def build_vector_store(dataset_name, embedder, retriever):
         
     print(f"\nFound {len(pdf_paths)} PDF(s) in {dataset_name}. Indexing incrementally...")
     
+    total_pages_processed = 0
+    total_chunks_created = 0
+    
     for pdf_path in pdf_paths:
+        file_name = os.path.basename(pdf_path)
         page_iter = extract_text_page_by_page(pdf_path)
         chunk_iter = chunk_text(page_iter, pdf_path)
         
         batch_texts = []
         batch_records = []
         
+        last_page_processed = 0
+        file_chunks = 0
+        
         for chunk in chunk_iter:
             batch_texts.append(chunk["text"])
             batch_records.append(chunk)
+            
+            file_chunks += 1
+            last_page_processed = max(last_page_processed, chunk["metadata"]["page"])
             
             if len(batch_texts) >= 32:
                 embeddings = embedder.get_embeddings_batch(batch_texts)
@@ -48,7 +58,15 @@ def build_vector_store(dataset_name, embedder, retriever):
                 rec["embedding"] = emb
             retriever.add_chunks(batch_records)
             
-    print(f"Index built! Total chunks embedded: {retriever.vector_store.index.ntotal}")
+        total_chunks_created += file_chunks
+        total_pages_processed += last_page_processed
+        print(f"  -> '{file_name}': Processed up to page {last_page_processed}, generated {file_chunks} chunks.")
+            
+    print(f"\nIndex built! Metrics:")
+    print(f"- Total Pages Processed: ~{total_pages_processed}")
+    print(f"- Total Chunks Created: {total_chunks_created}")
+    print(f"- FAISS Store Size: {retriever.vector_store.index.ntotal}")
+    
     retriever.save(index_dir)
     return True
 
