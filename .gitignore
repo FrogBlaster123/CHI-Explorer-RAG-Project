@@ -3,7 +3,6 @@
 *.env
 
 # Large Data Files (PDFs and Datasets)
-Data/
 data/*
 !data/indexes/
 *.pdf
