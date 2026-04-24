@@ -4,7 +4,8 @@
 
 # Large Data Files (PDFs and Datasets)
 Data/
-data/
+data/*
+!data/indexes/
 *.pdf
 
 # Python Clutter
