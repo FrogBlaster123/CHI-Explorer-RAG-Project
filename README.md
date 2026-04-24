@@ -34,6 +34,12 @@ GEMINI_API_KEY=your_actual_api_key_here
 
 The system operates strictly on a two-phase architecture to isolate the massive computation load. 
 
+### ⚡ Quick Start: Pre-Computed Index
+If you want to skip the 15,000+ page indexing process and just query the 500+ CHI papers immediately:
+1. Download the pre-computed index here: [CHI Papers Vector Index (Google Drive)](https://drive.google.com/file/d/1bv-LGsiGgm8dakVXHSCNgdff-tsrHYxs/view?usp=sharing)
+2. Extract the `.zip` so that your folder structure looks exactly like this: `data/indexes/chi_papers/faiss_index.bin`
+3. Skip Phase 1 entirely and go straight to **Phase 2** or **Phase 3**!
+
 ### Phase 1: Indexing (Run it only once)
 Whenever you start a new topic, create a folder in your `data/` directory (e.g. `data/chi_papers/`) and dump all your `.pdf` proceedings globally into it. 
 
